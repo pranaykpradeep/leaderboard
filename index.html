@@ -204,16 +204,28 @@
     </div>
 
     <script>
-        // Backend API URL
-        const API_URL = '/api/teams';
-        let teams = [];
+        // Hardcoded teams array in the user's specified order with points assigned
+        let teams = [
+            { id: 1, name: "NOVA", level: 1, points: 100, avatar: "NO", levelCompletionTime: {} },
+            { id: 2, name: "Cryptchasers", level: 1, points: 90, avatar: "CR", levelCompletionTime: {} },
+            { id: 3, name: "Enigma explorers", level: 1, points: 80, avatar: "EE", levelCompletionTime: {} },
+            { id: 4, name: "The Vampire", level: 1, points: 70, avatar: "TV", levelCompletionTime: {} },
+            { id: 5, name: "mystery finders", level: 1, points: 60, avatar: "MF", levelCompletionTime: {} },
+            { id: 6, name: "Hawk Eyes", level: 1, points: 50, avatar: "HE", levelCompletionTime: {} },
+            { id: 7, name: "Seek Quel", level: 1, points: 40, avatar: "SQ", levelCompletionTime: {} },
+            { id: 8, name: "Mystic hunters", level: 1, points: 30, avatar: "MH", levelCompletionTime: {} },
+            { id: 9, name: "Coin chasers", level: 1, points: 20, avatar: "CC", levelCompletionTime: {} },
+            { id: 10, name: "Dominators", level: 1, points: 10, avatar: "DO", levelCompletionTime: {} },
+            { id: 11, name: "Treasure seekers", level: 0, points: 0, avatar: "TS", levelCompletionTime: {} },
+            { id: 12, name: "Sneaky seekers", level: 0, points: 0, avatar: "SS", levelCompletionTime: {} },
+            { id: 13, name: "Zephyr", level: 0, points: 0, avatar: "ZE", levelCompletionTime: {} }
+        ];
 
-        // Function to update the leaderboard
         function updateLeaderboard() {
             const tbody = document.getElementById('leaderboard-body');
             tbody.innerHTML = '';
-            // Sort by points (descending) and take top 10
-            const topTeams = [...teams].sort((a, b) => b.points - a.points).slice(0, 10);
+            // Top 10 by points (already ordered)
+            const topTeams = teams.slice(0, 10);
             topTeams.forEach((team, index) => {
                 const rank = index + 1;
                 const row = document.createElement('tr');
@@ -236,29 +248,8 @@
             document.getElementById('update-time').textContent = new Date().toLocaleTimeString();
         }
 
-        // Fetch teams from backend
-        async function loadTeams() {
-            try {
-                const res = await fetch(API_URL);
-                if (!res.ok) throw new Error('Failed to fetch teams');
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    teams = data;
-                } else {
-                    teams = [];
-                }
-            } catch (err) {
-                alert('Error loading leaderboard: ' + err.message);
-                teams = [];
-            }
-            updateLeaderboard();
-        }
-
         // Initial update
-        loadTeams();
-
-        // Real-time updates every 30 seconds
-        setInterval(loadTeams, 30000);
+        updateLeaderboard();
     </script>
 </body>
 </html>
