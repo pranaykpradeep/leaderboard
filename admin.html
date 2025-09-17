@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Treasure Hunt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .view-btn {
+            padding: 12px 25px;
+            background: rgba(46, 204, 113, 0.3);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .view-btn:hover {
+            background: rgba(46, 204, 113, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .admin-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .teams-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .team-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .team-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+        
+        .team-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .team-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .team-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .team-level {
+            font-size: 2rem;
+            font-weight: bold;
+            color: gold;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .level-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .level-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(52, 152, 219, 0.3);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .level-btn:hover {
+            background: rgba(52, 152, 219, 0.5);
+        }
+        
+        .completion-time {
+            text-align: center;
+            font-size: 0.9rem;
+            margin: 10px 0;
+            opacity: 0.8;
+        }
+        
+        .points-info {
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 10px 0;
+            color: gold;
+        }
+        
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(46, 204, 113, 0.3);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .save-btn:hover {
+            background: rgba(46, 204, 113, 0.5);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .teams-list {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .team-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Admin Panel</h1>
+            <a href="index.html" class="view-btn">View Leaderboard</a>
+        </header>
+        
+        <div class="admin-panel">
+            <h2 class="panel-title">Update Team Levels</h2>
+            <p style="margin-bottom: 20px; text-align: center; opacity: 0.8;">
+                First team to complete a level gets bonus points! Points = (Level × 1000) + Bonus
+            </p>
+            <div class="teams-list" id="teams-list">
+                <!-- Team cards will be populated here -->
+            </div>
+        </div>
+        
+        <div class="notification" id="notification">
+            Levels updated successfully!
+        </div>
+    </div>
+
+    <script>
+        // Load teams from localStorage
+        let teams = JSON.parse(localStorage.getItem('treasureHuntTeams'));
+        
+        if (!teams) {
+            // Sample data for the treasure hunt teams
+                        teams = [
+                            { id: 1, name: "Mystic Hunterz", level: 0, points: 0, avatar: "MH", levelCompletionTime: {} },
+                                { id: 2, name: "The Clue-Less", level: 0, points: 0, avatar: "TC", levelCompletionTime: {} },
+                                { id: 3, name: "Seek-Quel", level: 0, points: 0, avatar: "SQ", levelCompletionTime: {} },
+                                { id: 4, name: "InnoQuest", level: 0, points: 0, avatar: "IQ", levelCompletionTime: {} },
+                                { id: 5, name: "Clue crusaders", level: 0, points: 0, avatar: "CC", levelCompletionTime: {} },
+                                { id: 6, name: "mystery finders", level: 0, points: 0, avatar: "MF", levelCompletionTime: {} },
+                                { id: 7, name: "Hawk Eyes", level: 0, points: 0, avatar: "HE", levelCompletionTime: {} },
+                                { id: 8, name: "Looters", level: 0, points: 0, avatar: "LO", levelCompletionTime: {} },
+                                { id: 9, name: "Enigma explorers", level: 0, points: 0, avatar: "EE", levelCompletionTime: {} },
+                                { id: 10, name: "Zephyr", level: 0, points: 0, avatar: "ZE", levelCompletionTime: {} },
+                                { id: 11, name: "Treasure seekers", level: 0, points: 0, avatar: "TS", levelCompletionTime: {} },
+                                { id: 12, name: "Sneaky seekers", level: 0, points: 0, avatar: "SS", levelCompletionTime: {} },
+                                { id: 13, name: "Sviluppatori segreti", level: 0, points: 0, avatar: "SS", levelCompletionTime: {} },
+                                { id: 14, name: "NOVA", level: 0, points: 0, avatar: "NO", levelCompletionTime: {} },
+                                { id: 15, name: "Coin Chasers", level: 0, points: 0, avatar: "CC", levelCompletionTime: {} },
+                                { id: 16, name: "Huntopia", level: 0, points: 0, avatar: "HU", levelCompletionTime: {} },
+                                { id: 17, name: "Cryptchasers", level: 0, points: 0, avatar: "RR", levelCompletionTime: {} },
+                                { id: 18, name: "The Seekers", level: 0, points: 0, avatar: "TS", levelCompletionTime: {} },
+                                { id: 19, name: "Hidden Treasures", level: 0, points: 0, avatar: "HT", levelCompletionTime: {} },
+                                { id: 20, name: "The Adventurers", level: 0, points: 0, avatar: "TA", levelCompletionTime: {} }
+                 ];
+            localStorage.setItem('treasureHuntTeams', JSON.stringify(teams));
+        }
+        
+        // Calculate points with bonus for first completion
+        function calculatePoints(team) {
+            // Base points (1000 per level)
+            let points = team.level * 1000;
+            
+            // Bonus points for being first to complete levels
+            let bonus = 0;
+            for (const level in team.levelCompletionTime) {
+                // Check if this team was first to complete this level
+                const completionTime = team.levelCompletionTime[level];
+                let isFirst = true;
+                
+                for (const otherTeam of teams) {
+                    if (otherTeam.id !== team.id && 
+                        otherTeam.levelCompletionTime[level] && 
+                        otherTeam.levelCompletionTime[level] < completionTime) {
+                        isFirst = false;
+                        break;
+                    }
+                }
+                
+                if (isFirst) {
+                    // Award 200 bonus points for each level where team was first
+                    bonus += 200;
+                }
+            }
+            
+            return points + bonus;
+        }
+        
+        // Function to render team cards
+        function renderTeams() {
+            const teamsList = document.getElementById('teams-list');
+            teamsList.innerHTML = '';
+            
+            // Sort teams by name for admin panel
+            const sortedTeams = [...teams].sort((a, b) => a.name.localeCompare(b.name));
+            
+            sortedTeams.forEach(team => {
+                const card = document.createElement('div');
+                card.className = 'team-card';
+                
+                // Get completion time for current level if exists
+                const completionTime = team.levelCompletionTime[team.level] 
+                    ? new Date(team.levelCompletionTime[team.level]).toLocaleTimeString() 
+                    : 'Not completed yet';
+                
+                card.innerHTML = `
+                    <div class="team-header">
+                        <div class="team-avatar">${team.avatar}</div>
+                        <div class="team-name">${team.name}</div>
+                    </div>
+                    <div class="team-level">Level ${team.level}</div>
+                    <div class="points-info">Points: ${calculatePoints(team)}</div>
+                    <div class="completion-time">Level ${team.level} completed: ${completionTime}</div>
+                    <div class="level-controls">
+                        <button class="level-btn" onclick="changeLevel(${team.id}, -1)">-</button>
+                        <button class="level-btn" onclick="changeLevel(${team.id}, 1)">+</button>
+                    </div>
+                    <button class="save-btn" onclick="markLevelCompleted(${team.id})">Mark Level Completed</button>
+                `;
+                
+                teamsList.appendChild(card);
+            });
+        }
+        
+        // Function to change level
+        function changeLevel(teamId, change) {
+            const team = teams.find(t => t.id === teamId);
+            if (team) {
+                team.level += change;
+                if (team.level < 1) team.level = 1;
+                
+                // Update points
+                team.points = calculatePoints(team);
+                
+                // Save to localStorage
+                localStorage.setItem('treasureHuntTeams', JSON.stringify(teams));
+                
+                // Re-render teams
+                renderTeams();
+            }
+        }
+        
+        // Function to mark level as completed
+        function markLevelCompleted(teamId) {
+            const team = teams.find(t => t.id === teamId);
+            if (team) {
+                // Record completion time for current level
+                team.levelCompletionTime[team.level] = new Date().toISOString();
+                
+                // Update points
+                team.points = calculatePoints(team);
+                
+                // Save to localStorage
+                localStorage.setItem('treasureHuntTeams', JSON.stringify(teams));
+                
+                // Show notification
+                const notification = document.getElementById('notification');
+                notification.textContent = `${team.name} completed Level ${team.level}!`;
+                notification.classList.add('show');
+                
+                // Re-render teams
+                renderTeams();
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+        
+        // Initial render
+        renderTeams();
+    </script>
+</body>
+</html>
