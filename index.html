@@ -1,3 +1,13 @@
+        // Mark level 3 for DOMINATORS and Coin chasers
+        ["DOMINATORS", "Coin chasers"].forEach((grp) => {
+            const norm = normalize(grp);
+            if (teamNameMap.hasOwnProperty(norm)) {
+                const lvls = teams[teamNameMap[norm]].levels;
+                if (!lvls.includes(3)) {
+                    lvls.push(3);
+                }
+            }
+        });
 <!DOCTYPE html>
 <html lang="en">
 <head>
