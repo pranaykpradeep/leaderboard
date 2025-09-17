@@ -251,34 +251,65 @@
     </div>
 
     <script>
-        // Load teams from localStorage
-        let teams = JSON.parse(localStorage.getItem('treasureHuntTeams'));
-        
-        if (!teams) {
-            // Sample data for the treasure hunt teams
-                        teams = [
-                            { id: 1, name: "Mystic Hunterz", level: 0, points: 0, avatar: "MH", levelCompletionTime: {} },
-                                { id: 2, name: "The Clue-Less", level: 0, points: 0, avatar: "TC", levelCompletionTime: {} },
-                                { id: 3, name: "Seek-Quel", level: 0, points: 0, avatar: "SQ", levelCompletionTime: {} },
-                                { id: 4, name: "InnoQuest", level: 0, points: 0, avatar: "IQ", levelCompletionTime: {} },
-                                { id: 5, name: "Clue crusaders", level: 0, points: 0, avatar: "CC", levelCompletionTime: {} },
-                                { id: 6, name: "mystery finders", level: 0, points: 0, avatar: "MF", levelCompletionTime: {} },
-                                { id: 7, name: "Hawk Eyes", level: 0, points: 0, avatar: "HE", levelCompletionTime: {} },
-                                { id: 8, name: "Looters", level: 0, points: 0, avatar: "LO", levelCompletionTime: {} },
-                                { id: 9, name: "Enigma explorers", level: 0, points: 0, avatar: "EE", levelCompletionTime: {} },
-                                { id: 10, name: "Zephyr", level: 0, points: 0, avatar: "ZE", levelCompletionTime: {} },
-                                { id: 11, name: "Treasure seekers", level: 0, points: 0, avatar: "TS", levelCompletionTime: {} },
-                                { id: 12, name: "Sneaky seekers", level: 0, points: 0, avatar: "SS", levelCompletionTime: {} },
-                                { id: 13, name: "Sviluppatori segreti", level: 0, points: 0, avatar: "SS", levelCompletionTime: {} },
-                                { id: 14, name: "NOVA", level: 0, points: 0, avatar: "NO", levelCompletionTime: {} },
-                                { id: 15, name: "Coin Chasers", level: 0, points: 0, avatar: "CC", levelCompletionTime: {} },
-                                { id: 16, name: "Huntopia", level: 0, points: 0, avatar: "HU", levelCompletionTime: {} },
-                                { id: 17, name: "Cryptchasers", level: 0, points: 0, avatar: "RR", levelCompletionTime: {} },
-                                { id: 18, name: "The Seekers", level: 0, points: 0, avatar: "TS", levelCompletionTime: {} },
-                                { id: 19, name: "Hidden Treasures", level: 0, points: 0, avatar: "HT", levelCompletionTime: {} },
-                                { id: 20, name: "The Adventurers", level: 0, points: 0, avatar: "TA", levelCompletionTime: {} }
-                 ];
-            localStorage.setItem('treasureHuntTeams', JSON.stringify(teams));
+        // Backend API URL
+        const API_URL = '/api/teams';
+        let teams = [];
+
+        // Default sample data (used if backend is empty)
+        const defaultTeams = [
+            { id: 1, name: "Mystic Hunterz", level: 0, points: 0, avatar: "MH", levelCompletionTime: {} },
+            { id: 2, name: "The Clue-Less", level: 0, points: 0, avatar: "TC", levelCompletionTime: {} },
+            { id: 3, name: "Seek-Quel", level: 0, points: 0, avatar: "SQ", levelCompletionTime: {} },
+            { id: 4, name: "InnoQuest", level: 0, points: 0, avatar: "IQ", levelCompletionTime: {} },
+            { id: 5, name: "Clue crusaders", level: 0, points: 0, avatar: "CC", levelCompletionTime: {} },
+            { id: 6, name: "mystery finders", level: 0, points: 0, avatar: "MF", levelCompletionTime: {} },
+            { id: 7, name: "Hawk Eyes", level: 0, points: 0, avatar: "HE", levelCompletionTime: {} },
+            { id: 8, name: "Looters", level: 0, points: 0, avatar: "LO", levelCompletionTime: {} },
+            { id: 9, name: "Enigma explorers", level: 0, points: 0, avatar: "EE", levelCompletionTime: {} },
+            { id: 10, name: "Zephyr", level: 0, points: 0, avatar: "ZE", levelCompletionTime: {} },
+            { id: 11, name: "Treasure seekers", level: 0, points: 0, avatar: "TS", levelCompletionTime: {} },
+            { id: 12, name: "Sneaky seekers", level: 0, points: 0, avatar: "SS", levelCompletionTime: {} },
+            { id: 13, name: "Sviluppatori segreti", level: 0, points: 0, avatar: "SS", levelCompletionTime: {} },
+            { id: 14, name: "NOVA", level: 0, points: 0, avatar: "NO", levelCompletionTime: {} },
+            { id: 15, name: "Coin Chasers", level: 0, points: 0, avatar: "CC", levelCompletionTime: {} },
+            { id: 16, name: "Huntopia", level: 0, points: 0, avatar: "HU", levelCompletionTime: {} },
+            { id: 17, name: "Cryptchasers", level: 0, points: 0, avatar: "RR", levelCompletionTime: {} },
+            { id: 18, name: "The Seekers", level: 0, points: 0, avatar: "TS", levelCompletionTime: {} },
+            { id: 19, name: "Hidden Treasures", level: 0, points: 0, avatar: "HT", levelCompletionTime: {} },
+            { id: 20, name: "The Adventurers", level: 0, points: 0, avatar: "TA", levelCompletionTime: {} }
+        ];
+
+        // Fetch teams from backend
+        async function loadTeams() {
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error('Failed to fetch teams');
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    teams = data;
+                } else {
+                    // If backend is empty, initialize with default teams
+                    teams = defaultTeams;
+                    await saveTeams();
+                }
+            } catch (err) {
+                alert('Error loading teams from server: ' + err.message);
+                teams = defaultTeams;
+            }
+            renderTeams();
+        }
+
+        // Save teams to backend
+        async function saveTeams() {
+            try {
+                await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(teams)
+                });
+            } catch (err) {
+                alert('Error saving teams to server: ' + err.message);
+            }
         }
         
         // Calculate points with bonus for first completion
@@ -353,14 +384,8 @@
             if (team) {
                 team.level += change;
                 if (team.level < 1) team.level = 1;
-                
-                // Update points
                 team.points = calculatePoints(team);
-                
-                // Save to localStorage
-                localStorage.setItem('treasureHuntTeams', JSON.stringify(teams));
-                
-                // Re-render teams
+                saveTeams();
                 renderTeams();
             }
         }
@@ -369,23 +394,13 @@
         function markLevelCompleted(teamId) {
             const team = teams.find(t => t.id === teamId);
             if (team) {
-                // Record completion time for current level
                 team.levelCompletionTime[team.level] = new Date().toISOString();
-                
-                // Update points
                 team.points = calculatePoints(team);
-                
-                // Save to localStorage
-                localStorage.setItem('treasureHuntTeams', JSON.stringify(teams));
-                
-                // Show notification
+                saveTeams();
                 const notification = document.getElementById('notification');
                 notification.textContent = `${team.name} completed Level ${team.level}!`;
                 notification.classList.add('show');
-                
-                // Re-render teams
                 renderTeams();
-                
                 setTimeout(() => {
                     notification.classList.remove('show');
                 }, 3000);
@@ -393,7 +408,7 @@
         }
         
         // Initial render
-        renderTeams();
+    loadTeams();
     </script>
 </body>
 </html>
