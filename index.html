@@ -194,27 +194,109 @@
 
     <script>
         // Hardcoded teams array in the user's specified order with points assigned
+        // Each team has an array of level submissions (order matters)
         let teams = [
-            { id: 1, name: "NOVA", level: 1, points: 100, avatar: "NO", levelCompletionTime: {} },
-            { id: 2, name: "Cryptchasers", level: 1, points: 90, avatar: "CR", levelCompletionTime: {} },
-            { id: 3, name: "Enigma explorers", level: 1, points: 80, avatar: "EE", levelCompletionTime: {} },
-            { id: 4, name: "The Vampire", level: 1, points: 70, avatar: "TV", levelCompletionTime: {} },
-            { id: 5, name: "mystery finders", level: 1, points: 60, avatar: "MF", levelCompletionTime: {} },
-            { id: 6, name: "Hawk Eyes", level: 1, points: 50, avatar: "HE", levelCompletionTime: {} },
-            { id: 7, name: "Seek Quel", level: 1, points: 40, avatar: "SQ", levelCompletionTime: {} },
-            { id: 8, name: "Mystic hunters", level: 1, points: 30, avatar: "MH", levelCompletionTime: {} },
-            { id: 9, name: "Coin chasers", level: 1, points: 20, avatar: "CC", levelCompletionTime: {} },
-            { id: 10, name: "Dominators", level: 1, points: 10, avatar: "DO", levelCompletionTime: {} },
-            { id: 11, name: "Treasure seekers", level: 0, points: 0, avatar: "TS", levelCompletionTime: {} },
-            { id: 12, name: "Sneaky seekers", level: 0, points: 0, avatar: "SS", levelCompletionTime: {} },
-            { id: 13, name: "Zephyr", level: 0, points: 0, avatar: "ZE", levelCompletionTime: {} }
+            { id: 1, name: "NOVA", avatar: "NO", levels: [] },
+            { id: 2, name: "Cryptchasers", avatar: "CR", levels: [] },
+            { id: 3, name: "Enigma explorers", avatar: "EE", levels: [] },
+            { id: 4, name: "The Vampire", avatar: "TV", levels: [] },
+            { id: 5, name: "mystery finders", avatar: "MF", levels: [] },
+            { id: 6, name: "Hawk Eyes", avatar: "HE", levels: [] },
+            { id: 7, name: "Seek Quel", avatar: "SQ", levels: [] },
+            { id: 8, name: "Mystic hunters", avatar: "MH", levels: [] },
+            { id: 9, name: "Coin chasers", avatar: "CC", levels: [] },
+            { id: 10, name: "Dominators", avatar: "DO", levels: [] },
+            { id: 11, name: "Treasure seekers", avatar: "TS", levels: [] },
+            { id: 12, name: "Sneaky seekers", avatar: "SS", levels: [] },
+            { id: 13, name: "Zephyr", avatar: "ZE", levels: [] }
         ];
+
+        // Provided group submissions for level 1 (first occurrence only, ignore not in teams)
+        const groupSubmissionsRaw1 = [
+            "NOVA","NOVA","Nova","NOVA","Cryptchasers","Enigma explorers","The Vampire","NOVA","Mystery finders","Noah","Nova","NOVA","Nova","NOVA","NOVA","Hawk Eyes","Seek Quel","Mystic hunters","Coin chasers","Dominators","Treasure seekers","Coin chasers","Coin chasers","Coin chasers","Cryptchasers","Cryptchasers","Mystic hunterz","Coin chasers","Coin chasers","Coin seekers","Sneaky seekers","Treasure seekers","Sneaky seekers","Treasure Seekers","Cryptchasers","Cryptchasers","Cryptchasers","Sneky seekers","Cryptchasers","Zephyr","Treasure seekers","Coin chasers","Coin seekers","Coin chasers","Treasure seekers","Coin seekers","DOMINATORS","Sneaky seekers","Sneaky seekers","The clue-less","Clue crsaders","Treasure seekers","Sneaky seekers","Treasure seekers","Cryptchasers","Cryptchasers","Cryptchasers","Cryptchasers","Coin chasers","Sneaky seekers","The Vampire","The Clue-less","Hawk eyes","The clue less","Vampire","Tresure seekers","The clue less","Dominators","Mystic hunterz","Hawk eyes","Mystic hunterz","Sneaky seekers","The clue-less","Vampire","The Vampire","sviluppatori segreti","InnoQuest","InnoQuest","Vampire","InnoQuest","InnoQuest","Treasure seekers","Cryptchasers","looters","Vampire","N","Sviluppatori segreti","Looters","Innoquest","Sneaky seekers","Mystery finders","Mystery finders","Looters","Looters","Vampire","Mystic hunterz","Looters","Treasure seekers","Sneaky seekers","looters","Hawk eyes","Hawk eyes","The Vampire","InnoQuest","Thr clue less",".","Treasure seekers","The Clue-less","Cryptchasers","Test123","Looters",".","Innoquest","Cryptchasers","sviluppatori segreti","The Vampire","NOVA","Looters","Treasure seekers","Hawk eyes","The vampire","Sviluppatori segreti",".","Looters","Innoquest","The clue less","InnoQuest","Svillupattori segreti","sviluppatori segreti","Test","Looters","Clue crusaders","NOVA","Looters","Mystery finders","InnoQuest","InnoQuest","InnoQuest","Test123","Looters","Nova","Test123","Clash of Clues","Clash of Clues","NOVA","Test123","InnoQuest","Test","InnoQuest","Enigma explorers","The Vampire"
+        ];
+        // Provided group submissions for level 2 (first occurrence only, ignore not in teams)
+        const groupSubmissionsRaw2 = [
+            "Mystery finders","Dominators","Coin chasers","Coin seekers","Mystic hunterz","Zephyr","Sneaky seekers","Hawk eyes","Cryptchasers","Looters","nova","Clue crsaders"
+        ];
+
+        // Normalize function for matching
+        function normalize(name) {
+            return name.trim().toLowerCase().replace(/[^a-z0-9 ]/g, "");
+        }
+
+        // Build a map of team names for fast lookup
+        const teamNameMap = {};
+        teams.forEach((team, idx) => {
+            teamNameMap[normalize(team.name)] = idx;
+        });
+
+        // Track first occurrence only for level 1
+        const seen1 = new Set();
+        groupSubmissionsRaw1.forEach((grp) => {
+            const norm = normalize(grp);
+            if (teamNameMap.hasOwnProperty(norm) && !seen1.has(norm)) {
+                teams[teamNameMap[norm]].levels = [1]; // Mark level 1 as completed
+                seen1.add(norm);
+            }
+        });
+
+        // Track first occurrence only for level 2
+        const seen2 = new Set();
+        groupSubmissionsRaw2.forEach((grp) => {
+            const norm = normalize(grp);
+            if (teamNameMap.hasOwnProperty(norm) && !seen2.has(norm)) {
+                // If already has level 1, add level 2; else, set to [2]
+                const lvls = teams[teamNameMap[norm]].levels;
+                if (lvls.length === 0) {
+                    teams[teamNameMap[norm]].levels = [2];
+                } else if (!lvls.includes(2)) {
+                    teams[teamNameMap[norm]].levels.push(2);
+                }
+                seen2.add(norm);
+            }
+        });
+
+        // For each level, assign points based on submit order
+        function calculatePoints(teams, numLevels = 3, fullPoints = 100) {
+            // For each level, determine the order of submission
+            let levelOrders = Array.from({length: numLevels}, (_, i) => []);
+            teams.forEach((team, tIdx) => {
+                team.levels.forEach((level, lIdx) => {
+                    // level-1 for 0-based index
+                    levelOrders[level-1].push({ teamIdx: tIdx, order: lIdx });
+                });
+            });
+            // For each level, sort by order (simulate submission order)
+            let levelPoints = Array.from({length: teams.length}, () => Array(numLevels).fill(0));
+            for (let lvl = 0; lvl < numLevels; lvl++) {
+                // Sort by order (lower order = earlier submit)
+                let orderArr = levelOrders[lvl].sort((a, b) => a.order - b.order);
+                orderArr.forEach((entry, idx) => {
+                    let points = 0;
+                    if (idx === 0) points = fullPoints;
+                    else if (idx < 4) points = fullPoints - 10 * idx;
+                    else if (idx < 6) points = fullPoints - 10 * 3 - 15 * (idx - 3);
+                    else points = fullPoints - 10 * 3 - 15 * 2 - 20 * (idx - 5);
+                    if (points < 75) points = 75;
+                    levelPoints[entry.teamIdx][lvl] = points;
+                });
+            }
+            // Sum up total points for each team
+            return teams.map((team, idx) => {
+                const total = levelPoints[idx].reduce((a, b) => a + b, 0);
+                return { ...team, points: total };
+            });
+        }
+
+        teams = calculatePoints(teams);
 
         function updateLeaderboard() {
             const tbody = document.getElementById('leaderboard-body');
             tbody.innerHTML = '';
-            // Top 10 by points (already ordered)
-            const topTeams = teams.slice(0, 10);
+            // Sort by points descending
+            const sortedTeams = [...teams].sort((a, b) => b.points - a.points);
+            const topTeams = sortedTeams.slice(0, 10);
             topTeams.forEach((team, index) => {
                 const rank = index + 1;
                 const row = document.createElement('tr');
@@ -227,7 +309,6 @@
                         <div class="avatar">${team.avatar}</div>
                         ${team.name}
                     </td>
-                    <!-- Level column removed -->
                     <td class="points">${team.points}</td>
                 `;
                 tbody.appendChild(row);
