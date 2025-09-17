@@ -204,53 +204,22 @@
     </div>
 
     <script>
-        // Load teams from localStorage or use sample data
-        let teams = JSON.parse(localStorage.getItem('treasureHuntTeams'));
-        
-        if (!teams) {
-            // Sample data for the treasure hunt teams
-            teams = [
-                { id: 1, name: "Mystic Hunterz", level: 0, points: 0, avatar: "MH", levelCompletionTime: {} },
-                { id: 2, name: "The Clue-Less ", level: 0, points: 0, avatar: "CL", levelCompletionTime: {} },
-                { id: 3, name: "Seek-Quel", level: 0, points: 0, avatar: "SQ", levelCompletionTime: {} },
-                { id: 4, name: "InnoQuest", level: 0, points: 0, avatar: "IQ", levelCompletionTime: {} },
-                { id: 5, name: "Clue crusaders ", level: 0, points: 0, avatar: "CC", levelCompletionTime: {} },
-                { id: 6, name: "mystery finders ", level: 0, points: 0, avatar: "MF", levelCompletionTime: {} },
-                { id: 7, name: "Hawk Eyes", level: 0, points: 0, avatar: "HE", levelCompletionTime: {} },
-                { id: 8, name: "Looters", level: 0, points: 0, avatar: "LO", levelCompletionTime: {} },
-                { id: 9, name: "Enigma explorers ", level: 0, points: 0, avatar: "EE", levelCompletionTime: {} },
-                { id: 10, name: "Zephyr ", level: 0, points: 0, avatar: "ZE", levelCompletionTime: {} },
-                { id: 11, name: "Treasure seekers", level: 0, points: 0, avatar: "TS", levelCompletionTime: {} },
-                { id: 12, name: "Sneaky seekers ", level: 0, points: 0, avatar: "SS", levelCompletionTime: {} },
-                { id: 13, name: "Sviluppatori segreti ", level: 0, points: 0, avatar: "SS", levelCompletionTime: {} },
-                { id: 14, name: "NOVA ", level: 0, points: 0, avatar: "NO", levelCompletionTime: {} },
-                { id: 15, name: "Coin Chasers", level: 0, points: 0, avatar: "CC", levelCompletionTime: {} },
-                { id: 16, name: "Huntopia", level: 0, points: 0, avatar: "HU", levelCompletionTime: {} },
-                { id: 17, name: "Cryptchasers", level: 0, points: 0, avatar: "CR", levelCompletionTime: {} },
-                { id: 18, name: "The Seekers", level: 0, points: 0, avatar: "TS", levelCompletionTime: {} },
-                { id: 19, name: "Hidden Treasures", level: 0, points: 0, avatar: "HT", levelCompletionTime: {} },
-                { id: 20, name: "The Adventurers", level: 0, points: 0, avatar: "MC", levelCompletionTime: {} }
-
-            ];
-            localStorage.setItem('treasureHuntTeams', JSON.stringify(teams));
-        }
+        // Backend API URL
+        const API_URL = '/api/teams';
+        let teams = [];
 
         // Function to update the leaderboard
         function updateLeaderboard() {
             const tbody = document.getElementById('leaderboard-body');
             tbody.innerHTML = '';
-            
             // Sort by points (descending) and take top 10
             const topTeams = [...teams].sort((a, b) => b.points - a.points).slice(0, 10);
-            
             topTeams.forEach((team, index) => {
                 const rank = index + 1;
                 const row = document.createElement('tr');
-                
                 if (rank <= 3) {
                     row.classList.add('top-3');
                 }
-                
                 row.innerHTML = `
                     <td class="rank">${rank}</td>
                     <td class="name">
@@ -262,27 +231,34 @@
                     </td>
                     <td class="points">${team.points}</td>
                 `;
-                
                 tbody.appendChild(row);
             });
-            
-            // Update the last updated time
             document.getElementById('update-time').textContent = new Date().toLocaleTimeString();
         }
 
-        // Initial update
-        updateLeaderboard();
-
-        // Simulate real-time updates every 30 seconds
-        setInterval(() => {
-            // In a real application, you would fetch updated data from a server
-            // For this demo, we'll just reload from localStorage
-            const updatedTeams = JSON.parse(localStorage.getItem('treasureHuntTeams'));
-            if (updatedTeams) {
-                teams = updatedTeams;
-                updateLeaderboard();
+        // Fetch teams from backend
+        async function loadTeams() {
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error('Failed to fetch teams');
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    teams = data;
+                } else {
+                    teams = [];
+                }
+            } catch (err) {
+                alert('Error loading leaderboard: ' + err.message);
+                teams = [];
             }
-        }, 30000);
+            updateLeaderboard();
+        }
+
+        // Initial update
+        loadTeams();
+
+        // Real-time updates every 30 seconds
+        setInterval(loadTeams, 30000);
     </script>
 </body>
 </html>
