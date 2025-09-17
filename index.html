@@ -204,11 +204,11 @@
             { id: 3, name: "Enigma explorers", avatar: "EE", points: 250 },
             { id: 4, name: "The Vampire", avatar: "TV", points: 240 },
             { id: 5, name: "mystery finders", avatar: "MF", points: 235 },
-            { id: 6, name: "Hawk Eyes", avatar: "HE", points: 250 },
+            { id: 6, name: "Hawk Eyes", avatar: "HE", points: 300 },
             { id: 7, name: "Seek Quel", avatar: "SQ", points: 210 },
             { id: 8, name: "Mystic hunters", avatar: "MH", points: 200 },
-            { id: 9, name: "Coin chasers", avatar: "CC", points: 190 },
-            { id: 10, name: "Dominators", avatar: "DO", points: 180 },
+            { id: 9, name: "Coin chasers", avatar: "CC", points: 200 },
+            { id: 10, name: "Dominators", avatar: "DO", points: 500, winner: true },
             { id: 11, name: "Treasure seekers", avatar: "TS", points: 245 },
             { id: 12, name: "Sneaky seekers", avatar: "SS", points: 265 },
             { id: 13, name: "Zephyr", avatar: "ZE", points: 150 },
@@ -230,16 +230,26 @@
                 if (rank <= 3) {
                     row.classList.add('top-3');
                 }
+                if (team.winner) {
+                    row.classList.add('winner-row');
+                }
                 row.innerHTML = `
                     <td class="rank">${rank}</td>
                     <td class="name">
                         <div class="avatar">${team.avatar}</div>
-                        ${team.name}
+                        ${team.name} ${team.winner ? '<span style="color: gold; font-weight: bold; font-size: 1.1em; margin-left: 8px;">🏆 Winner!</span>' : ''}
                     </td>
                     <td class="points">${team.points}</td>
                 `;
                 tbody.appendChild(row);
             });
+        // Add winner row highlight style if not present
+        if (!document.getElementById('winner-row-style')) {
+            const style = document.createElement('style');
+            style.id = 'winner-row-style';
+            style.innerHTML = `.winner-row { background: linear-gradient(90deg, gold 0%, #fffbe6 100%) !important; color: #222 !important; }`;
+            document.head.appendChild(style);
+        }
             document.getElementById('update-time').textContent = new Date().toLocaleTimeString();
         }
 
