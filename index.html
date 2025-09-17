@@ -118,18 +118,7 @@
             font-size: 1.2rem;
         }
         
-        .level {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .level-number {
-            font-weight: bold;
-            min-width: 30px;
-            font-size: 1.4rem;
-            color: gold;
-        }
+        /* .level and .level-number styles removed */
         
         .points {
             text-align: right;
@@ -190,7 +179,7 @@
                     <tr>
                         <th class="rank">Rank</th>
                         <th class="name">Team Name</th>
-                        <th class="level">Level</th>
+                        <!-- <th class="level">Level</th> -->
                         <th class="points">Points</th>
                     </tr>
                 </thead>
@@ -238,9 +227,7 @@
                         <div class="avatar">${team.avatar}</div>
                         ${team.name}
                     </td>
-                    <td class="level">
-                        <span class="level-number">${team.level}</span>
-                    </td>
+                    <!-- Level column removed -->
                     <td class="points">${team.points}</td>
                 `;
                 tbody.appendChild(row);
